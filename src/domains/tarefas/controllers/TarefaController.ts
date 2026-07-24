@@ -5,7 +5,6 @@ const service = new TarefaService()
 
 export class TarefaController {
   create(req: Request, res: Response) {
-    console.log('Método:', req.method, '| Body:', req.body)
     try {
       const { title } = req.body
       const tarefa = service.create({ title })
