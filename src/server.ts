@@ -1,13 +1,12 @@
-import express from 'express'
+const express = require('express')
+const { tarefaRoutes } = require('./routes/tarefa.routes')
 
 const app = express()
 const PORT = 3333
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
-  res.status(200).json({ mensagem: 'API de Tarefas funcionando!' })
-})
+app.use('/tasks', tarefaRoutes)
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`)
