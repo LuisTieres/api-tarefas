@@ -1,4 +1,5 @@
-import { Tarefa } from '../models/Tarefa'
+import { prisma } from '../../../config/prismaClient'
+import { Prisma } from '../../../../generated/prisma/client'
 
 interface ICriarTarefa {
   title: string
@@ -9,50 +10,48 @@ interface IAtualizarTarefa {
   completed?: boolean
 }
 
-const tarefas: Tarefa[] = []
-
 export class TarefaService {
-  create({ title }: ICriarTarefa): Tarefa {
+  async create({ title }: ICriarTarefa) {
     if (!title) {
       throw new Error('O título da tarefa é obrigatório')
     }
 
-    const novaTarefa: Tarefa = {
-      id: Math.random().toString(36).substring(2, 11),
-      title,
-      completed: false,
-    }
-
-    tarefas.push(novaTarefa)
-    return novaTarefa
+    return prisma.task.create({
+      data: { title },
+    })
   }
 
-  list(): Tarefa[] {
-    return tarefas
+  async getAll() {
+    return prisma.task.findMany()
   }
 
-  findById(id: string): Tarefa {
-    const tarefa = tarefas.find((t) => t.id === id)
+  async getById(id: number) {
+    const tarefa = await prisma.task.findUnique({ where: { id } })
     if (!tarefa) {
       throw new Error('Tarefa não encontrada')
     }
     return tarefa
   }
 
-  update(id: string, data: IAtualizarTarefa): Tarefa {
-    const tarefa = this.findById(id)
-
-    if (data.title !== undefined) tarefa.title = data.title
-    if (data.completed !== undefined) tarefa.completed = data.completed
-
-    return tarefa
+  async update(id: number, data: IAtualizarTarefa) {
+    try {
+      return await prisma.task.update({ where: { id }, data })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new Error('Tarefa não encontrada')
+      }
+      throw error
+    }
   }
 
-  delete(id: string): void {
-    const index = tarefas.findIndex((t) => t.id === id)
-    if (index === -1) {
-      throw new Error('Tarefa não encontrada')
+  async delete(id: number) {
+    try {
+      await prisma.task.delete({ where: { id } })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new Error('Tarefa não encontrada')
+      }
+      throw error
     }
-    tarefas.splice(index, 1)
   }
 }

@@ -1,7 +1,6 @@
+import { Router } from 'express'
 import type { Request, Response } from 'express'
-
-const { Router } = require('express')
-const { TarefaController } = require('../domains/tarefas/controllers/TarefaController')
+import { TarefaController } from '../domains/tarefas/controllers/TarefaController'
 
 const tarefaRoutes = Router()
 const controller = new TarefaController()
@@ -12,4 +11,4 @@ tarefaRoutes.get('/:id', (req: Request, res: Response) => controller.findById(re
 tarefaRoutes.put('/:id', (req: Request, res: Response) => controller.update(req, res))
 tarefaRoutes.delete('/:id', (req: Request, res: Response) => controller.delete(req, res))
 
-module.exports = { tarefaRoutes }
+export { tarefaRoutes }
